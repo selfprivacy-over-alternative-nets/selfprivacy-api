@@ -13,6 +13,7 @@ from selfprivacy_api.utils.systemd import (
     wait_for_unit_state,
 )
 from selfprivacy_api.services.service import Service, ServiceStatus
+from selfprivacy_api.utils import get_domain
 
 from selfprivacy_api.services.prometheus.icon import PROMETHEUS_ICON
 
@@ -41,6 +42,9 @@ class Prometheus(Service):
     @staticmethod
     def get_url() -> Optional[str]:
         """Return service url."""
+        domain = get_domain()
+        if domain and domain.endswith(".onion"):
+            return f"https://{domain}/prometheus/"
         return None
 
     @staticmethod

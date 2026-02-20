@@ -173,6 +173,8 @@ class ServiceManager(Service):
     def get_url() -> typing.Optional[str]:
         """Return service url."""
         domain = get_domain()
+        if domain and domain.endswith(".onion"):
+            return f"https://{domain}/api/"
         return f"https://api.{domain}"
 
     @staticmethod

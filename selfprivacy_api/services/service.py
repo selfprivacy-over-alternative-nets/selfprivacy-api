@@ -33,6 +33,16 @@ from selfprivacy_api.services.moving import (
     move_data_to_volume,
 )
 
+# Tor subpath URL mapping (service_id -> nginx path)
+_TOR_SERVICE_PATHS = {
+    "nextcloud": "/nextcloud/",
+    "gitea": "/git/",
+    "jitsi-meet": "/jitsi/",
+    "matrix": "/_matrix/",
+    "monitoring": "/prometheus/",
+    "selfprivacy-api": "/api/",
+}
+
 
 DEFAULT_START_STOP_TIMEOUT = 5 * 60
 
@@ -83,8 +93,13 @@ class Service(ABC):
     def get_url(cls) -> Optional[str]:
         """
         The url of the service if it is accessible from the internet browser.
+        For .onion domains, returns subpath-based URLs matching nginx config.
         """
         domain = get_domain()
+        if domain and domain.endswith(".onion"):
+            path = _TOR_SERVICE_PATHS.get(cls.get_id())
+            if path:
+                return f"https://{domain}{path}"
         subdomain = cls.get_subdomain()
         return f"https://{subdomain}.{domain}"
 
