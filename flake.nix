@@ -17,13 +17,17 @@
         builtins.match ''.*version="([^"]+)".*'' (builtins.readFile ./setup.py)
       );
 
-      # sanic-25.x has a flaky keep-alive timeout test that fails in the Nix
-      # sandbox. Override it globally so the package builds cleanly.
+      # sanic-25.x test_keep_alive_client_timeout fails (assert 2 == 1) inside
+      # the Nix sandbox due to timing sensitivity. Tests run via doInstallCheck
+      # (not doCheck). Skip the entire file to unblock the build chain.
       mkPkgs = system: import nixpkgs {
         inherit system;
         overlays = [(final: prev: {
           python312Packages = prev.python312Packages.overrideScope (_: pprev: {
-            sanic = pprev.sanic.overrideAttrs (_: { doCheck = false; });
+            sanic = pprev.sanic.overrideAttrs (old: {
+              disabledTestPaths = old.disabledTestPaths
+                ++ [ "test_keep_alive_timeout.py" ];
+            });
           });
         })];
       };
