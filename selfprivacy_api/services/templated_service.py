@@ -42,16 +42,7 @@ from selfprivacy_api.utils.systemd import (
     restart_unit,
     listen_for_unit_state_changes,
 )
-
-# Tor subpath URL mapping (service_id -> nginx path)
-_TOR_SERVICE_PATHS = {
-    "nextcloud": "/nextcloud/",
-    "gitea": "/git/",
-    "jitsi-meet": "/jitsi/",
-    "matrix": "/_matrix/",
-    "monitoring": "/prometheus/",
-    "selfprivacy-api": "/api/",
-}
+from selfprivacy_api.services.onion_routing import TOR_SERVICE_PATHS
 
 SP_MODULES_DEFINITIONS_PATH = "/etc/sp-modules"
 SP_SUGGESTED_MODULES_PATH = "/etc/suggested-sp-modules"
@@ -207,7 +198,7 @@ class TemplatedService(Service):
             return None
         domain = get_domain()
         if domain and domain.endswith(".onion"):
-            path = _TOR_SERVICE_PATHS.get(self.get_id())
+            path = TOR_SERVICE_PATHS.get(self.get_id())
             if path:
                 return f"https://{domain}{path}"
         subdomain = self.get_subdomain()
