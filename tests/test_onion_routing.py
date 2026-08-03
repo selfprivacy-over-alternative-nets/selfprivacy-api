@@ -154,7 +154,8 @@ def test_json_user_repository_instantiates(generic_userdata):
     assert repo is not None
 
 
-def test_json_user_repository_get_users_returns_list(generic_userdata):
+@pytest.mark.asyncio
+async def test_json_user_repository_get_users_returns_list(generic_userdata):
     repo = JsonUserRepository()
-    result = repo.get_users()
+    result = await repo.get_users()
     assert isinstance(result, list)
